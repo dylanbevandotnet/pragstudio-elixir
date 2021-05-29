@@ -6,7 +6,7 @@
         {
             "label": "build file",
             "type": "shell",
-            "command": "elixir -r servy/lib/parser.ex -r servy/lib/plugins.ex ${relativeFile} ",
+            "command": "elixir -r servy/lib/conv.ex -r servy/lib/parser.ex -r servy/lib/plugins.ex ${relativeFile} ",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
