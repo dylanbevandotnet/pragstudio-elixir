@@ -6,7 +6,7 @@
         {
             "label": "build file",
             "type": "shell",
-            "command": "elixir ${relativeFile}",
+            "command": "elixir -r servy/lib/parser.ex -r servy/lib/plugins.ex ${relativeFile} ",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -27,7 +27,11 @@
             "command": "iex -S mix",
             "options": {
                 "cwd": "${workspaceFolder}/servy"
-            }
+            },
+            "problemMatcher": [
+                "$mixCompileError"
+            ],
+            "group": "build"
         }
     ]
 }
