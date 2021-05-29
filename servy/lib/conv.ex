@@ -3,7 +3,8 @@ defmodule Servy.Conv do
     method: "",
     path: "",
     resp_body: "",
-    status: nil
+    status: nil,
+    params: %{}
   ]
 
   def full_status(conv) do

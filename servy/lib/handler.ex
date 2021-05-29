@@ -34,19 +34,12 @@ defmodule Servy.Handler do
     |> File.read
     |> handle_file(conv)
   end
-  # def route(%{ method: "GET", path: "/about"} = conv) do
-  #   file = Path.expand("../../pages", __DIR__)git
-  #          |> Path.join("about.html")
-  #          |> File.read
-  #   case file do
-  #     {:ok, content} ->
-  #       %{ conv | status: 200, resp_body: content}
-  #     {:error, :enoent} ->
-  #       %{ conv | status: 404, resp_body: "File not found"}
-  #     {:error, reason} ->
-  #       %{ conv | status: 500, resp_body: "File error: #{reason}"}
-  #   end
-  # end
+
+  #name=Baloo&type=Brown
+  def route(%Conv{ method: "POST"} = conv) do
+    %{ conv | status: 201, resp_body: "Created a #{conv.params["type"]} bear named #{conv.params["name"]}" }
+  end
+
   def route(%Conv{ path: path} = conv) do
     %{ conv | resp_body: "No #{path} here", status: 404 }
   end
@@ -171,6 +164,28 @@ Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
 
+"""
+
+# expected_response = """
+# HTTP/1.1 200 OK
+# Content-Type: text/html
+# Content-Length: 6
+
+# Bear 1
+# """
+
+response = Servy.Handler.handle(request)
+IO.puts response
+
+request = """
+POST /bears HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 21
+
+name=Baloo&type=Brown
 """
 
 # expected_response = """

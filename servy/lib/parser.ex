@@ -6,12 +6,19 @@ defmodule  Servy.Parser do
   Parses an HTTP request to a map
   """
   def parse(request) do
-    [method, path, _] = request
-                        |> String.split("\n")
-                        |> List.first
-                        |> String.split(" ")
+    [top, params_string] = String.split(request, "\n\n")
+    [request_line | header_lines] = String.split(top, "\n")
+    [method, path, _] = request_line |> String.split(" ")
+
+    params = parse_params(params_string)
+
     %Conv{
        method: method,
-       path: path}
+       path: path,
+       params: params}
+  end
+
+  def parse_params(params_string) do
+    params_string |> String.trim |> URI.decode_query
   end
 end
