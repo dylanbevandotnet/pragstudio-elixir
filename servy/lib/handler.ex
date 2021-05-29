@@ -2,9 +2,12 @@ defmodule Servy.Handler do
   def handle(request) do
     request
     |> parse
+    |> log
     |> route
     |> format_response
   end
+
+  def log(conv), do: IO.inspect conv
 
   def parse(request) do
     [method, path, _] = request
@@ -15,10 +18,11 @@ defmodule Servy.Handler do
   end
 
   def route(conv) do
-    # only works because we have resp_body already there
-    # to add one you'd have to do Map.put(conv, :resp_body, "Bears, Lions, Tigers")
-    %{ conv | resp_body: "Bears, Lions, Tigers" }
+    route(conv, conv.method, conv.path)
   end
+
+  def route(conv, "GET", "/wildthings"), do: %{ conv | resp_body: "Bears, Lions, Tigers" }
+  def route(conv, "GET", "/bears"), do: %{ conv | resp_body: "Teddy, Smokey, Paddington" }
 
   def format_response(conv) do
     """
@@ -46,6 +50,26 @@ Accept: */*
 # Content-Length: 20
 
 # Bears, Lions, Tigers
+# """
+
+response = Servy.Handler.handle(request)
+IO.puts response
+
+
+request = """
+GET /bears HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+# expected_response = """
+# HTTP/1.1 200 OK
+# Content-Type: text/html
+# Content-Length: 25
+
+# Teddy, Smokey, Paddington
 # """
 
 response = Servy.Handler.handle(request)
