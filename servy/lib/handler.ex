@@ -2,10 +2,23 @@ defmodule Servy.Handler do
   def handle(request) do
     request
     |> parse
+    |> rewrite_path
     |> log
     |> route
+    |> track
     |> format_response
   end
+
+  def track(%{status: 404, path: path} = conv) do
+    IO.puts "Warning: #{path} is on the loose!"
+    conv
+  end
+  def track(conv), do: conv
+
+  def rewrite_path(%{ path: "/wildlife"} = conv) do
+    %{ conv | path: "/wildthings"}
+  end
+  def rewrite_path(conv), do: conv
 
   def log(conv), do: IO.inspect conv
 
@@ -20,14 +33,10 @@ defmodule Servy.Handler do
        status: 200}
   end
 
-  def route(conv) do
-    route(conv, conv.method, conv.path)
-  end
-
-  def route(conv, "GET", "/wildthings"), do: %{ conv | resp_body: "Bears, Lions, Tigers" }
-  def route(conv, "GET", "/bears"), do: %{ conv | resp_body: "Teddy, Smokey, Paddington" }
-  def route(conv, "GET", "/bears/" <> id), do: %{ conv | resp_body: "Bear #{id}" }
-  def route(conv, _method, path) do
+  def route(%{ method: "GET", path: "/wildthings"} = conv), do: %{ conv | resp_body: "Bears, Lions, Tigers" }
+  def route(%{ method: "GET", path: "/bears"} = conv), do: %{ conv | resp_body: "Teddy, Smokey, Paddington" }
+  def route(%{ method: "GET", path: "/bears/" <> id} = conv), do: %{ conv | resp_body: "Bear #{id}" }
+  def route(%{ path: path} = conv) do
     %{ conv | resp_body: "No #{path} here", status: 404 }
   end
 
@@ -117,6 +126,25 @@ IO.puts response
 
 request = """
 GET /bears/1 HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+# expected_response = """
+# HTTP/1.1 200 OK
+# Content-Type: text/html
+# Content-Length: 6
+
+# Bear 1
+# """
+
+response = Servy.Handler.handle(request)
+IO.puts response
+
+request = """
+GET /wildlife HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
