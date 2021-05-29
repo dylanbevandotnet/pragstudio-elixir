@@ -15,13 +15,18 @@ defmodule Servy.Handler do
   end
 
   def route(conv) do
-    conv = %{ method: "GET", path: "/wildthings", resp_body: "Bears, Lions, Tigers"}
+    # only works because we have resp_body already there
+    # to add one you'd have to do Map.put(conv, :resp_body, "Bears, Lions, Tigers")
+    %{ conv | resp_body: "Bears, Lions, Tigers" }
   end
 
   def format_response(conv) do
     """
     HTTP/1.1 200 OK
     Content-Type: text/html
+    Content-Length: #{String.length(conv.resp_body)}
+
+    #{conv.resp_body}
 
     """
   end
