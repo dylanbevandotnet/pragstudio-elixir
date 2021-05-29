@@ -36,9 +36,32 @@ defmodule Servy.Handler do
   def route(%{ method: "GET", path: "/wildthings"} = conv), do: %{ conv | resp_body: "Bears, Lions, Tigers" }
   def route(%{ method: "GET", path: "/bears"} = conv), do: %{ conv | resp_body: "Teddy, Smokey, Paddington" }
   def route(%{ method: "GET", path: "/bears/" <> id} = conv), do: %{ conv | resp_body: "Bear #{id}" }
+  def route(%{ method: "GET", path: "/about"} = conv) do
+    Path.expand("../../pages", __DIR__)
+    |> Path.join("about.html")
+    |> File.read
+    |> handle_file(conv)
+  end
+  # def route(%{ method: "GET", path: "/about"} = conv) do
+  #   file = Path.expand("../../pages", __DIR__)
+  #          |> Path.join("about.html")
+  #          |> File.read
+  #   case file do
+  #     {:ok, content} ->
+  #       %{ conv | status: 200, resp_body: content}
+  #     {:error, :enoent} ->
+  #       %{ conv | status: 404, resp_body: "File not found"}
+  #     {:error, reason} ->
+  #       %{ conv | status: 500, resp_body: "File error: #{reason}"}
+  #   end
+  # end
   def route(%{ path: path} = conv) do
     %{ conv | resp_body: "No #{path} here", status: 404 }
   end
+
+  def handle_file({:ok, content}, conv), do: %{ conv | status: 200, resp_body: content}
+  def handle_file({:error, :enoent}, conv), do: %{ conv | status: 404, resp_body: "File not found"}
+  def handle_file({:error, reason}, conv), do: %{ conv | status: 500, resp_body: "File error: #{reason}"}
 
   @spec format_response(atom | %{:resp_body => binary, :status => any, optional(any) => any}) ::
           <<_::64, _::_*8>>
@@ -145,6 +168,25 @@ IO.puts response
 
 request = """
 GET /wildlife HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+# expected_response = """
+# HTTP/1.1 200 OK
+# Content-Type: text/html
+# Content-Length: 6
+
+# Bear 1
+# """
+
+response = Servy.Handler.handle(request)
+IO.puts response
+
+request = """
+GET /about HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
