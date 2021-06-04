@@ -10,7 +10,7 @@ defmodule Servy.BearController do
       @template_path
       |> Path.join(template)
       |> EEx.eval_file(bindings)
-    %{ conv | resp_body: content }
+    %{ conv | status: 200, resp_body: content }
   end
 
   def index(%Conv{} = conv) do
@@ -25,6 +25,6 @@ defmodule Servy.BearController do
   end
 
   def create(%Conv{} = conv, %{"name" => name, "type" => type}) do
-    %{ conv | status: 201, resp_body: "Created a #{type} bear named #{name}" }
+    %{ conv | status: 201, resp_body: "Created a #{type} bear named #{name}!" }
   end
 end
