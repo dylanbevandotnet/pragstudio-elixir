@@ -27,7 +27,6 @@
         // "alefragnani.Bookmarks", // Manage bookmarks
         // "quicktype.quicktype", // Paste JSON as code
         // "spikespaz.vscode-smoothtype", // smooth cursor animation
-        "ckolkman.vscode-postgres",
     ],
     "settings": {
         "files.eol": "\n",
