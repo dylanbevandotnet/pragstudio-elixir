@@ -45,6 +45,10 @@ defmodule Servy.Handler do
     BearController.create(conv, conv.params)
   end
 
+  def route(%Conv{ method: "POST", path: "/api/bears"} = conv) do
+    BearController.create(conv, conv.params)
+  end
+
   def route(%Conv{ path: path} = conv) do
     %{ conv | resp_body: "No #{path} here!", status: 404 }
   end
